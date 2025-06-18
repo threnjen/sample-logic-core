@@ -1,16 +1,49 @@
-from game_contracts.game_logic_interface import GameLogicABC
+# from game_contracts.game_logic_interface import GameLogicABC
 from src.game_logic.game_config import available_functions
 
 
 class SampleGameLogic:
-    def __init__(self):
-        super().__init__()
+    def __init__(self, requesting_client):
+        self.game_over = False
+        self.requesting_client = requesting_client
 
-    def setup_game_state(self, game_state: dict) -> None: ...
+    def setup_game_state(self) -> dict[str, str]:
+        if not self.check_game_in_progress():
+            self.game_state = self.build_new_game_state()
+        else:
+            self.game_state = self.load_ongoing_game_state()
+        return self.report_current_game_state()
 
-    def build_new_game_state(self) -> dict: ...
+    def check_game_in_progress(self) -> bool:
+        """
+        Check if a game is in the game registry already.
+        """
+        # abstracted away until the game storage runner is implemented
+        # Will check dynamodb for existing game
+        return False
 
-    def is_game_over(self) -> bool: ...
+    def build_new_game_state(self) -> dict[str, str]:
+        """
+        Build a new game state for the game.
+        """
+        # abstracted away until the game storage runner is implemented
+        return {}
+
+    def load_ongoing_game_state(self) -> dict[str, str]:
+        """
+        Load the game state from the game storage.
+        """
+        # abstracted away until the game storage runner is implemented
+        self.game_over = False
+        return {}
+
+    def report_current_game_state(self) -> dict[str, str]:
+        return self.game_state
+
+    def update_game_state(self): ...
+
+    def is_game_over(self) -> bool:
+        return self.game_over
 
     def get_current_player(self) -> int: ...
 
@@ -18,27 +51,7 @@ class SampleGameLogic:
 
     def apply_action(self, input_player: str) -> None: ...
 
-    def report_game_state(self) -> dict[str, str]: ...
-
     def post_turn_cleanup(self, player_id: int) -> None: ...
-
-    def update_game_state(self):
-
-        new_game_state = self.report_game_state()
-
-        game_state_diff = {
-            x: y for x, y in new_game_state.items() if self.game_state.get(x) != y
-        }
-
-        # Placeholder for actual logic to push game state to client
-        # This should be replaced with the actual implementation
-        print("Pushing game state to client:", game_state_diff)
-
-        self.game_state = new_game_state
-
-    def handle_out_of_turn(self, input_data):
-        pass
-        self.update_game_state()
 
     def handle_input(self, input_data):
 
